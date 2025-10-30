@@ -9,9 +9,9 @@ This folder hosts a self-contained DeepSeek-OCR pipeline with three clear layers
 - `outputs/`: split into `raw/` (model text dumps) and `processed/` (post-processing artifacts).
 
 ## Quick Start
-1. Install dependencies (run inside your DeepSeek-OCR conda env):
+1. Install dependencies (run inside your DeepSeek-OCR conda env). The repo-wide `requirements.txt` now bundles both the base project and pipeline extras such as pandas/openpyxl:
    ```bash
-   pip install -r ocr_pipeline/requirements.txt
+   pip install -r requirements.txt
    ```
 2. Place test images inside `ocr_pipeline/images/`.
 3. Run the pipeline:
