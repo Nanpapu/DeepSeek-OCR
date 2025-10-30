@@ -2,6 +2,6 @@
 Model wrappers for DeepSeek-OCR usage.
 """
 
-from .deepseek_ocr import DeepSeekOCRModel
+from .deepseek_ocr import DeepSeekOCRConfig, DeepSeekOCRModel, OCRResult
 
-__all__ = ["DeepSeekOCRModel"]
+__all__ = ["DeepSeekOCRConfig", "DeepSeekOCRModel", "OCRResult"]
