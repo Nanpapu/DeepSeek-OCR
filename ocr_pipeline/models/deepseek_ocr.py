@@ -11,7 +11,7 @@ class DeepSeekOCRConfig:
 
     model_name: str = "deepseek-ai/DeepSeek-OCR"
     device: Optional[str] = None  # "cuda", "cpu" or None to auto-detect
-    attn_implementation: str = "flash_attention_2"
+    attn_implementation: str = "auto"
     use_safetensors: bool = True
     prompt_template: str = "<image>\\n<|grounding|>Convert the document to markdown."
     default_base_size: int = 1024
@@ -52,11 +52,14 @@ class DeepSeekOCRModel:
             self.config.model_name,
             trust_remote_code=True,
         )
+
+        attn_impl = self._resolve_attention_impl()
+
         self._model = AutoModel.from_pretrained(
             self.config.model_name,
             trust_remote_code=True,
             use_safetensors=self.config.use_safetensors,
-            _attn_implementation=self.config.attn_implementation,
+            _attn_implementation=attn_impl,
             **self.config.model_kwargs,
         )
 
@@ -67,6 +70,22 @@ class DeepSeekOCRModel:
             self._model = self._model.to(self.config.device).to(target_dtype)
         else:
             self._model = self._model.to(self.config.device)
+
+    def _resolve_attention_impl(self) -> str:
+        """Determine which attention implementation to request."""
+        attn_override = self.config.attn_implementation
+        if attn_override != "auto":
+            return attn_override
+
+        # Prefer FlashAttention on CUDA when available, otherwise fall back to eager.
+        if self.config.device == "cuda":
+            try:
+                import flash_attn  # type: ignore # noqa: F401
+
+                return "flash_attention_2"
+            except Exception:
+                return "eager"
+        return "eager"
 
     @property
     def is_loaded(self) -> bool:
